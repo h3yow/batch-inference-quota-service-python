@@ -177,10 +177,11 @@ class Store:
         return [self._row_to_task(r) for r in rows]
 
     def count_active_tasks(self, tenant_id: str) -> int:
+        """在途任务数（PENDING + RUNNING），用于并发额度判断。"""
         with self._lock:
             row = self._db().execute(
-                "SELECT COUNT(*) c FROM tasks WHERE tenant_id=? AND status=?",
-                (tenant_id, TaskStatus.RUNNING.value),
+                "SELECT COUNT(*) c FROM tasks WHERE tenant_id=? AND status IN (?,?)",
+                (tenant_id, TaskStatus.PENDING.value, TaskStatus.RUNNING.value),
             ).fetchone()
         return int(row["c"])
 
