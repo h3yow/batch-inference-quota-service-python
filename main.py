@@ -22,6 +22,7 @@ def build_service(db_path: str = "batch_service.db") -> BatchService:
     worker = Worker(store)
     service = BatchService(store, quota, worker)
     service.recover()
+    worker.start()
     return service
 
 
